@@ -22,6 +22,8 @@ import {
   Gesture,
   GestureHandlerRootView,
 } from 'react-native-gesture-handler';
+import { useRouter } from 'expo-router';
+import usePhoto from '@/hooks/usePhoto';
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,12 +34,15 @@ const ZOOM_PRESETS = [
   { label: '2×',   value: 0.5 },
 ];
 
-export default function CameraScreen({ navigation }) {
+export default function CameraScreen() {
+  const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing]             = useState('back');
   const [flash, setFlash]               = useState('off');
   const [activePreset, setActivePreset] = useState(1);
   const [focusPoint, setFocusPoint]     = useState(null);
+  const router = useRouter();
+  const { uploadPhoto } = usePhoto();
 
   // Reanimated shared values
   const zoom          = useSharedValue(0);       // 0–1 range for expo-camera
@@ -127,6 +132,26 @@ export default function CameraScreen({ navigation }) {
 
   const flashIcon = flash === 'off' ? '⚡' : flash === 'on' ? '⚡' : 'A';
 
+  const handleCapture = async () => {
+    try {
+      const photo = await cameraRef.current?.takePictureAsync();
+      if (photo?.uri) {
+        // In a real app, you'd likely want to save the photo to the device
+        // or upload it to your server here. For this demo, we'll just log it.
+        console.log('Photo captured:', photo.uri);
+        const formData = new FormData();
+        formData.append('image', {
+          uri: photo.uri,
+          name: `photo_${Date.now()}.jpg`,
+          type: 'image/jpeg',
+        } as any);
+        await uploadPhoto(formData);
+      }
+    } catch (error) {
+      console.error('Error capturing photo:', error);
+    }
+  }
+
   return (
     <GestureHandlerRootView style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
@@ -134,6 +159,7 @@ export default function CameraScreen({ navigation }) {
       <GestureDetector gesture={composed}>
         <Animated.View style={[styles.viewfinder, viewfinderStyle]}>
           <CameraView
+            ref={cameraRef}
             style={StyleSheet.absoluteFill}
             facing={facing}
             flash={flash}
@@ -172,7 +198,7 @@ export default function CameraScreen({ navigation }) {
           <View style={styles.topBar}>
             <TouchableOpacity
               style={styles.topBtn}
-              onPress={() => navigation.goBack()}
+              onPress={() => router.replace("/gallery")}
             >
               <Text style={styles.topBtnText}>✕</Text>
             </TouchableOpacity>
@@ -218,7 +244,7 @@ export default function CameraScreen({ navigation }) {
         <TouchableOpacity
           style={styles.shutter}
           activeOpacity={0.8}
-          onPress={() => {/* handle capture */}}
+          onPress={handleCapture}
         >
           <View style={styles.shutterInner} />
         </TouchableOpacity>

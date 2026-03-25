@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import useAuth from '@/hooks/useAuth';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -11,10 +13,29 @@ import {
   StatusBar,
 } from 'react-native';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
+  const { isAuthenticated, loading, login } = useAuth();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [focused, setFocused]   = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/gallery');
+    }
+  }, []);
+
+  const handleLogin = async () => {
+    if (loading) return;
+
+    if (email.trim() === '' || password.trim() === '') {
+      alert('Please enter both email and password.');
+      return;
+    }
+
+    await login(email, password);
+  }
 
   return (
     <KeyboardAvoidingView
@@ -74,7 +95,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         {/* Sign In button */}
-        <TouchableOpacity style={styles.button} activeOpacity={0.8}>
+        <TouchableOpacity disabled={loading} style={styles.button} activeOpacity={0.8} onPress={handleLogin}>
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
 
@@ -86,7 +107,6 @@ export default function LoginScreen({ navigation }) {
         {/* Register */}
         <TouchableOpacity
           style={styles.registerWrap}
-          onPress={() => navigation.navigate('Register')}
         >
           <Text style={styles.registerText}>
             Don't have an account?{' '}

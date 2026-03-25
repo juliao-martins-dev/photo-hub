@@ -1,3 +1,6 @@
+import useAuth from '@/hooks/useAuth';
+import usePhoto from '@/hooks/usePhoto';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -7,8 +10,9 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
-  SafeAreaView,
+  Button,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const CELL_SIZE = (width - 4) / 3;   // 3 columns with 2px gaps
@@ -25,7 +29,11 @@ function CameraIcon() {
   );
 }
 
-export default function GalleryScreen({ navigation, photos = [] }) {
+export default function GalleryScreen() {
+  const { loading, photos } = usePhoto();
+  const { logout } = useAuth();
+  const router = useRouter();
+
   const renderPhoto = ({ item }) => (
     <TouchableOpacity
       style={styles.cell}
@@ -47,6 +55,7 @@ export default function GalleryScreen({ navigation, photos = [] }) {
 
         {/* Navigation header */}
         <View style={styles.header}>
+          <Button title="Back" color="#0A84FF" onPress={logout} />
           <Text style={styles.title}>My Photos</Text>
           <TouchableOpacity>
             <Text style={styles.selectBtn}>Select</Text>
@@ -79,7 +88,7 @@ export default function GalleryScreen({ navigation, photos = [] }) {
         <TouchableOpacity
           style={styles.fab}
           activeOpacity={0.85}
-          onPress={() => navigation.navigate('Camera')}
+          onPress={() => router.push('/camera')}
         >
           {/* Outer glow ring */}
           <View style={styles.fabGlow} />
