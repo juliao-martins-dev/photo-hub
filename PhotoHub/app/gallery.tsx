@@ -1,6 +1,7 @@
 import useAuth from '@/hooks/useAuth';
 import usePhoto from '@/hooks/usePhoto';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import {
   View,
   Text,
@@ -30,7 +31,7 @@ function CameraIcon() {
 }
 
 export default function GalleryScreen() {
-  const { loading, photos } = usePhoto();
+  const { photos } = usePhoto();
   const { logout } = useAuth();
   const router = useRouter();
 

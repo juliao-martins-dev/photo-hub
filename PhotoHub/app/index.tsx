@@ -1,5 +1,4 @@
 import useAuth from "@/hooks/useAuth";
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -15,17 +14,10 @@ import {
 } from "react-native";
 
 export default function LoginScreen() {
-  const { error, isAuthenticated, loading, login } = useAuth();
+  const { error, loading, login, verifyAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [focused, setFocused] = useState(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/gallery");
-    }
-  }, []);
 
   const handleLogin = async () => {
     if (loading) return;

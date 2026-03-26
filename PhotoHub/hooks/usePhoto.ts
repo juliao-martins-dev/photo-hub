@@ -34,27 +34,16 @@ export default function usePhoto() {
   const uploadPhoto = async (formData: FormData) => {
     setLoading(true);
     try {
-      //   const delay = new Promise((resolve) => setTimeout(resolve, 30000));
-      //   const responses = client.post("api/photos/", formData, {
-      //     headers: {
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   });
 
-      //   const [response, _] = await Promise.all([responses, delay]);
-      //   router.replace("/gallery");
-
-      const [response] = await Promise.all([
-        client.post("api/photos/", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }),
-        new Promise((resolve) => setTimeout(resolve, 10000)),
-      ]);
+      const response = await client.post("api/photos/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       router.replace("/gallery");
       return response.data;
+      
     } catch (error) {
       console.error("Error uploading photo:", error);
       throw error;

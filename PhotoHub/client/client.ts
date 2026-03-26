@@ -1,4 +1,5 @@
 import axios from "axios";
+import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
 const client = axios.create({
@@ -16,7 +17,7 @@ client.interceptors.request.use(async (config) => {
 
 // client.interceptors.response.use(response => response, async error => {
 //     const originalRequest = error.config;
-//     if (error.response?.status === 401) {
+//     if (error.response?.status === 400) {
 //         router.replace("/");
 //     }
 //     return Promise.reject(error);

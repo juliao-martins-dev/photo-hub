@@ -40,6 +40,7 @@ export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState("back");
   const [flash, setFlash] = useState("off");
+  const [shuttering, setShuttering] = useState(false);
   const [activePreset, setActivePreset] = useState(1);
   const [focusPoint, setFocusPoint] = useState(null);
   const router = useRouter();
@@ -136,6 +137,9 @@ export default function CameraScreen() {
   const flashIcon = flash === "off" ? "⚡" : flash === "on" ? "⚡" : "A";
 
   const handleCapture = async () => {
+    if (shuttering) return;
+    setShuttering(true);
+    
     try {
       const photo = await cameraRef.current?.takePictureAsync();
       if (photo?.uri) {
@@ -152,6 +156,8 @@ export default function CameraScreen() {
       }
     } catch (error) {
       console.error("Error capturing photo:", error);
+    } finally {
+      setShuttering(false);
     }
   };
 
@@ -167,6 +173,7 @@ export default function CameraScreen() {
             facing={facing}
             flash={flash}
             zoom={zoom.value}
+            mute={true}
           />
 
           {loading && (
